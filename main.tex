@@ -10,23 +10,58 @@
 
 \begin{document}
 
-\maketitle
+% \maketitle
 
 \section{Introduction}
-
-the CPE energy is given by:\cite{cpekaminski}
-
+The DFTB3 Hamiltonan elements are given by\cite{cpekaminski}
 \begin{equation}
-     x_i(t+dt)   = x_i(t) + dt\ v_i(t) + 0.5\ dt^2\ a_i(t)
+    H_{\mu\nu} = H^0_{\mu\nu} + S_{\mu\nu} \sum_c q_c \left(
+        \frac{1}{2} \left( \gamma_{ac} + \gamma_{bc} \right) +
+        \frac{1}{3} \left( q_a \Gamma_{ac} + q_b \Gamma_{bc} \right) +
+        \frac{q_c}{6} \left( \Gamma_{ca} + \Gamma_{cb} \right) 
+    \right)
+    \label{eq:hamiltonian}
 \end{equation}
+The variational implicit dependence of the response density coefficients, $\mathbf{c}$, which must be added to the DFTB3 Hamiltonian matrix (Eqn.~\ref{eq:hamiltonian}) is derived form the chain rule:
+\begin{eqnarray}
+    \Delta H_{\mu\nu} &=& \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial \rho_{\mu\nu}}\\
+    &=& \sum_i \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_i} 
+    \frac{\partial q_i}{\partial \rho_{\mu\nu}},
+\end{eqnarray}
+where
+\begin{equation}
+    E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right] = \mathbf{c}^T \cdot \mathbf{M} \cdot \mathbf{q} + \frac{1}{2} \mathbf{c}^T \cdot \mathbf{N} \cdot \mathbf{c},
+\end{equation}
+so that
+\begin{equation}
+    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_i} = 
+    \mathbf{c^T} \cdot \left( \frac{\mathrm{\partial}\mathbf{M}}{\mathrm{\partial}q_i}\right) \cdot \mathbf{q} 
+    + [\mathbf{c^T}  \cdot \mathbf{M}]_i + \frac{1}{2}\mathbf{c}^T \cdot \left( \frac{\mathrm{\partial}\mathbf{N}}{\mathrm{\partial}q_i}\right) \cdot \mathbf{c}. 
+\end{equation}
+
+
+
+
+
+
+
+
+
+
+% \begin{equation}
+%     E_\mathrm{{dftb3/c}} = E_\mathrm{{dftb3}}\left[ \rho \right] + E_\mathrm{{cpe}}\left[\mathbf{q}, \mathbf{c}\right],
+% \label{eq:dftb3c_energy}
+% \end{equation}
+% The set of coefficients of the CPE response density basis that variationally minimizes the total DFTB3/C energy in Eqn.~\ref{eq:dftb3c_energy}  is given by:
+% \begin{equation}
+%     \mathbf{c}= -\mathbf{N}^{-1} \cdot \mathbf{M} \cdot \mathbf{q}
+% \end{equation}
 % \begin{figure}[h!]
 % \centering
 % \includegraphics[scale=1.7]{universe.jpg}
 % \caption{The Universe}
 % \label{fig:univerise}
 % \end{figure}
-
-\section{Conclusion}
 
 \bibliographystyle{plain}
 \bibliography{references}
