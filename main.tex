@@ -19,7 +19,7 @@
 
 
 \begin{document}
-\maketitle
+% \maketitle
 \section{DFTB2/CPE energy}
 \subsection{CPE energy}
 The CPE energy is given by:\cite{cpekaminski}
@@ -42,7 +42,7 @@ The CPE basis functions depend on the Mulliken charge, while the DFTB basis func
 \subsection{DFTB2 energy}
 The DFTB2 energy is given by:\cite{dftb2}
 \begin{equation}
-    E_\mathrm{dftb2} = \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}% + \frac{1}{3} \sum_{ab} q_a^2 q_b \Gamma_{ab}
+    E_\mathrm{dftb2} = \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}+ \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} % + \frac{1}{3} \sum_{ab} q_a^2 q_b \Gamma_{ab}
 \end{equation}
 The DFTB2 Hamiltonian matrix elements are given by:\cite{dftb2}
 \begin{equation}
@@ -90,7 +90,7 @@ Using the notation of Eq.~\ref{eq:shorthand}, we can rewrite this as:
 Separating the terms that appear in the standard DFTB2 gradient, and the DFTB2/CPE gradient, we arrive at the CPE gradient correction:
 \begin{eqnarray}
     - F_{kx} &=& \frac{\partial}{\partial R_{kx}} \left[  E_\mathrm{H0} + E_\gamma + E_\mathrm{rep} + E_\mathrm{shift} + E_\mathrm{cpe} - \sum_i^\mathrm{occ} n_i \varepsilon_i \left(\sum_{\mu} \sum_{\nu} C_{\mu i} C_{\nu i} S_{\mu\nu} - 1 \right) \right]\nonumber\\
-             &=& \underbrace{\frac{\partial}{\partial R_{kx}} \left[  E_\mathrm{H0} + E_\gamma  + E_\mathrm{rep}- \sum_i^\mathrm{occ} n_i \varepsilon_i \left(\sum_{\mu} \sum_{\nu} C_{\mu i} C_{\nu i} S_{\mu\nu} - 1 \right) \right]}_{\mathrm{DFTB2}}
+             &=& \underbrace{\frac{\partial}{\partial R_{kx}} \left[  E_\mathrm{H0} + E_\gamma  + E_\mathrm{rep}- \sum_i^\mathrm{occ} n_i \varepsilon_i \left(\sum_{\mu} \sum_{\nu} C_{\mu i} C_{\nu i} S_{\mu\nu} - 1 \right) \right]}_{\mathrm{Same~as~the~DFTB2~gradient}}
     +\frac{\partial}{\partial R_{kx}} \left[  E_\mathrm{shift} + E_\mathrm{cpe} \right]\nonumber\\
     &=& -F_{kx}^\mathrm{(dftb2)} + \frac{\partial E_\mathrm{shift}}{\partial R_{kx}} + \frac{\partial E_\mathrm{cpe}}{\partial R_{kx}}\\
 &=& - F_{kx}^\mathrm{(dftb2)}
@@ -99,7 +99,6 @@ Separating the terms that appear in the standard DFTB2 gradient, and the DFTB2/C
 \end{eqnarray}
 The last two terms are new and are presented in the next sections.
 
-\subsection{Shift gradient: $-F_{kx}^\mathrm{(shift)} = \frac{\partial E_\mathrm{shift}}{\partial R_{kx}}$}
 \subsection{CPE gradient: $-F_{kx}^\mathrm{(cpe)} = \frac{\partial E_\mathrm{cpe}}{\partial R_{kx}}$}
 The CPE energy depends explicitly on the coordinates via the Coulomb integrals, and implicitly on the coordinates via the CPE coefficients and the Mulliken charges:
 
@@ -136,20 +135,52 @@ or for $a=k$:
 \end{equation}
 This term must be calculated in the DFTB2 gradient code (missing up to now). 
 \subsubsection{(Explicit) dependence on $R_{kx}$}
-The derivative with respect to $R_{kx}$ is written via the tangent matrices.
+The derivative with respect to $R_{kx}$ is written via the matrix derivatives.
 \begin{equation}
     \frac{\partial E_\mathrm{{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx}} = 
     \mathbf{c^T} \cdot \left( \frac{\mathrm{\partial}\mathbf{M}}{\mathrm{\partial}R_{kx}}\right) \cdot \mathbf{q} 
     + \frac{1}{2}\mathbf{c}^T \cdot \left( \frac{\mathrm{\partial}\mathbf{N}}{\mathrm{\partial}R_{kx}}\right) \cdot \mathbf{c}. 
 \end{equation}
-The tangent matrix elements are the integral derivatives, shown in the appendix.
+The elements of the derivative matrices are the integral derivatives, shown in the appendix.
+
+\subsection{Shift gradient: $-F_{kx}^\mathrm{(shift)} = \frac{\partial E_\mathrm{shift}}{\partial R_{kx}}$}
+\begin{eqnarray}
+    \frac{\partial E_\mathrm{shift}}{\partial R_{kx}} &=& - \frac{1}{2} \frac{\partial }{\partial R_{kx}}\left[ \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} S_{\mu\nu} \left(
+    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} +
+    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_b}
+\right)\right]\nonumber\\
+&=& - \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} \left[ \frac{\partial S_{\mu\nu}}{\partial R_{kx}}\left( 
+    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} +
+    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_b}
+\right) \right. \nonumber\\
+&& \left.+ S_{\mu\nu} \left(
+    \frac{\partial^2 E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx}\partial q_a} +
+    \frac{\partial^2 E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx} \partial q_b}
+\right) \right]
+\end{eqnarray}
+The derivative of the overlap matrix is performed numerically, while the derivative of the CPE-energy is given by (in the charge-independent case):
+\begin{equation}
+    \frac{\partial^2 E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx}\partial q_a} = \frac{\partial}{\partial R_{kx}}\left[\mathbf{c^T} \cdot \mathbf{M}\right]_a = \left[\mathbf{c^T}  \cdot \frac{\partial \mathbf{M}}{\partial R_{kx}} \right]_a
+\end{equation}
+and similarly in the charge-dependent case:
+\begin{eqnarray}
+    \frac{\partial^2 E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx}\partial q_a} &=& \frac{\partial }{\partial R_{kx}} \left[
+    \mathbf{c^T} \cdot \left( \frac{\mathrm{\partial}\mathbf{M}}{\mathrm{\partial}q_a}\right) \cdot \mathbf{q} 
+    + [\mathbf{c^T}  \cdot \mathbf{M}]_a + 
+\frac{1}{2}\mathbf{c}^T \cdot \left( \frac{\mathrm{\partial}\mathbf{N}}{\mathrm{\partial}q_a}\right) \cdot \mathbf{c} \right] \nonumber\\
+&=& \mathbf{c^T} \cdot \left( \frac{\mathrm{\partial^2}\mathbf{M}}{\partial R_{kx}\mathrm{\partial}q_a}\right) \cdot \mathbf{q} 
++ \left[\mathbf{c^T}  \cdot \frac{\partial \mathbf{M}}{\partial R_{kx}} \right]_a
++\frac{1}{2}\mathbf{c}^T \cdot \left( \frac{\mathrm{\partial}^2\mathbf{N}}{\partial R_{kx}\mathrm{\partial}q_a}\right) \cdot \mathbf{c}
+\end{eqnarray}
+The matrix derivatives $\frac{\mathrm{\partial}^2\mathbf{M}}{\partial R_{kx}\mathrm{\partial}q_a}$ and $\frac{\mathrm{\partial}^2\mathbf{N}}{\partial R_{kx}\mathrm{\partial}q_a}$ are new and not implemented.
 
 
 \bibliographystyle{unsrt}
 \bibliography{references}
 \clearpage
+\section*{Appendices}
 \appendix
-\section{Appendix A}
+\section{Hamiltonian shift}
 
 \subsection{Mulliken charges}
 The Mulliken charge is given by:
@@ -194,28 +225,28 @@ In the CPE charge-dependent case:
     \mathbf{c^T} \cdot \left( \frac{\mathrm{\partial}\mathbf{M}}{\mathrm{\partial}q_a}\right) \cdot \mathbf{q} 
     + [\mathbf{c^T}  \cdot \mathbf{M}]_a + \frac{1}{2}\mathbf{c}^T \cdot \left( \frac{\mathrm{\partial}\mathbf{N}}{\mathrm{\partial}q_a}\right) \cdot \mathbf{c}. 
 \end{equation}
+See Giese and York (2012) for details.\cite{gieseyork2012}
 
+\section{Derivative matrix elements}
 
-\section{Matrix elements (derivatives)}
-
-\subsubsection{First order matrix (geometry)}
-The explicit tangent matrix elements is
+\subsection{First order matrix (geometry)}
+The matrix elements are:
 \begin{equation}
     \frac{\mathrm{\partial} N_{ij}}{\mathrm{\partial}R_{kx}} =
     \frac{\mathrm{\partial}}{\mathrm{\partial}R_{kx}}  \iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}\right)\phi_j^\mathrm{cpe}\left(\mathbf{r'}\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
 \end{equation}
 This is already implemented.
 
-\subsubsection{First order matrix (charge)}
-The explicit tangent matrix elements is:
+\subsection{First order matrix (charge)}
+The matrix elements are:
 \begin{equation}
 \frac{\mathrm{\partial} N_{ij}}{\mathrm{\partial}q_k} =
     \frac{\mathrm{\partial}}{\mathrm{\partial}q_k}  \iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}\right)\phi_j^\mathrm{cpe}\left(\mathbf{r'}\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
 \end{equation}
 This is already implemented.
 
-\subsubsection{Second order matrix (geometry)}
-The explicit tangent matrix elements is
+\subsection{Second order matrix (geometry)}
+The matrix elements are:
 \begin{equation}
     \frac{\mathrm{\partial} M_{ij}}{\mathrm{\partial}R_{kx}} =
     f(R_{ij})\frac{\mathrm{\partial}}{\mathrm{\partial}R_{kx}}  \iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}\right)\phi_j^\mathrm{dftb}\left(\mathbf{r'}\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
@@ -223,8 +254,8 @@ The explicit tangent matrix elements is
 \end{equation}
 This is already implemented.
 
-\subsubsection{Second order matrix (charge)}
-The explicit tangent matrix elements is (for DFTB2):
+\subsection{Second order matrix (charge)}
+The matrix elements are (for DFTB2):
 \begin{equation}
 \frac{\mathrm{\partial} M_{ij}}{\mathrm{\partial}q_k} =
     f(R_{ij})\frac{\mathrm{\partial}}{\mathrm{\partial}q_k}  \iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}, q_i\right)\phi_j^\mathrm{dftb2}\left(\mathbf{r'}\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
