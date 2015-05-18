@@ -20,7 +20,22 @@
 
 \begin{document}
 % \maketitle
+\section{Notation}
+Summation over atom centers is denoted by summation over indices $a, b, c,$ etc. Summation over AO-basis functions is denoted by summation over indices such as $\mu, \nu,$ etc. The notation "$\mu \in a$" means that the basis function $\mu$ is centered on the atom $a$.
+\\\\In the following sections we let $q_a$ be the \textit{Mulliken population} (always a strictly positive quantity), defined as:
+\begin{equation}
+    q_a = \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}
+    C_{\mu i} C_{\nu i} S_{\mu\nu}
+\end{equation}
+\\\\The charge fluctuation is then: 
+\begin{equation}
+    \Delta q_a = q_a - q_a^0
+\end{equation}
+
+
 \section{DFTB2/CPE energy}
+
+
 \subsection{CPE energy}
 The CPE energy is given by:\cite{cpekaminski}
 \begin{equation}
@@ -34,7 +49,7 @@ and the second order CPE-DFTB2 Coulomb interaction matrix elements are given by:
 \begin{equation}
     N_{ij} = \iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}\right)\phi_j^\mathrm{cpe}\left(\mathbf{r'}\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
 \end{equation}
-The CPE basis functions depend on the Mulliken charge, while the DFTB basis functions only have a charge dependence in DFTB3.
+The CPE basis functions depend on the Mulliken population, while the DFTB basis functions only have a charge dependence in DFTB3.
 \\\\The set of coefficients of the CPE response density basis that variationally minimizes the total CPE energy in Eqn.~\ref{eq:cpe_energy} is given (analytically) by:
 \begin{equation}
     \mathbf{c}= -\mathbf{N}^{-1} \cdot \mathbf{M} \cdot \mathbf{q}
@@ -58,15 +73,7 @@ The DFTB2 Hamiltonian matrix elements are given by:\cite{dftb2}
     H_{\mu\nu}^{\mathrm{(dftb2)}} = H^0_{\mu\nu} + \frac{1}{2}S_{\mu\nu} \sum_c \left( \gamma_{ac} + \gamma_{bc} \right)\Delta q_c 
 \end{equation}
 \subsection{Combined DFTB2/CPE energy}
-The CPE Hamiltonian shift is given by:\cite{gieseyork2012}
-\begin{equation}
-    \Delta H_{\mu\nu}^{\mathrm{(cpe)}} =  - \frac{1}{2} S_{\mu\nu} \left(
-    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} +
-    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_b}
-\right) \qquad \mu \in a, \nu \in b
-\end{equation}
-See Appendix A for details.
-\\\\The full DFTB2/CPE energy is given by:
+The full DFTB2/CPE energy is given by:
 \begin{eqnarray}
     E_\mathrm{{dftb2/cpe}} &=& \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} H_{\mu\nu}^{\mathrm{(dftb2)}}  
     + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab}
@@ -81,14 +88,22 @@ See Appendix A for details.
  + E_{\mathrm{cpe}}\\\nonumber\\
 &=&  E_\mathrm{H0} + E_\gamma + E_\mathrm{rep} + E_\mathrm{cpe}\label{eq:shorthand}
 \end{eqnarray}
-The occupied orbital energies is given in the terms of the (optimized) coefficients and the matrix elements mentioned previously:
+The CPE Hamiltonian shift is given by:\cite{gieseyork2012}
+\begin{equation}
+    \Delta H_{\mu\nu}^{\mathrm{(cpe)}} =  \frac{1}{2} S_{\mu\nu} \left(
+    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} +
+    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_b}
+\right) \qquad \mu \in a, \nu \in b
+\end{equation}
+Note that here $q_a$ and $q_b$ are the Mulliken populations. Giese and York (2012) give the derivative in terms of the Mulliken charge and differ by a sign. See Appendix A for details.
+\\\\The occupied orbital energies is given in the terms of the (optimized) coefficients and the matrix elements mentioned previously:
 \begin{eqnarray}
-    \sum_i n_i \varepsilon_i 
+    \sum_i^\mathrm{occ} n_i \varepsilon_i 
     &=& \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} H_{\mu\nu}\nonumber\\
     &=& \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} \left(H_{\mu\nu}^{\mathrm{(dftb2)}} + \Delta H_{\mu\nu}^{\mathrm{(cpe)}} \right)\nonumber\\
     &=& \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} H_{\mu\nu}^0
-    + \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} S_{\mu\nu} \sum_c \left( \gamma_{ac} + \gamma_{bc} \right)\Delta q_c \nonumber\\
-    && -\ \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} S_{\mu\nu} \left(
+    + \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} S_{\mu\nu} \sum_c \left( \gamma_{ac} + \gamma_{bc} \right)\Delta q_c \nonumber\\
+    && +\ \frac{1}{2} \sum_i^\mathrm{occ} n_i  \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b} C_{\mu i} C_{\nu i} S_{\mu\nu} \left(
     \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} +
     \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_b} \right)\label{eq:orbital_energies}
 \end{eqnarray}
@@ -96,18 +111,34 @@ Using the relation above, the energy can be calculated in terms of the orbital e
 
 \begin{eqnarray}
     E_\mathrm{{dftb2/cpe}}
-    &=& \sum_i n_i \varepsilon_i 
-    - \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} S_{\mu\nu} \sum_c \left( \gamma_{ac} + \gamma_{bc} \right)\Delta q_c \nonumber\\
-    && \underbrace{+\ \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} S_{\mu\nu} \left(
+    &=& \sum_i^\mathrm{occ} n_i \varepsilon_i 
+    - \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} S_{\mu\nu} \sum_c \left( \gamma_{ac} + \gamma_{bc} \right)\Delta q_c \nonumber\\
+    && \underbrace{- \ \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} S_{\mu\nu} \left(
     \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} +
     \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_b} \right)}_{E_\mathrm{shift}} \nonumber\\
     && +\ \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}
     + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} + E_{\mathrm{cpe}}
 \end{eqnarray}
-
-The $E_\mathrm{shift}$ must be added to the electronic energy, in addition to $E_\mathrm{cpe}$.
-
-
+The $E_\mathrm{shift}$ must be subtracted from the electronic energy to compensate for double counting when adding $E_\mathrm{cpe}$ to the electronic energy in terms of the occupied orbital energies.
+\\\\The following relation is useful:
+\begin{eqnarray}
+    E_\mathrm{shift}
+    &=& - \ \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} S_{\mu\nu} \left(
+    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} +
+    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_b} \right) \nonumber\\
+    &=& - \ \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} S_{\mu\nu}
+    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} \nonumber\\
+    && - \ \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} S_{\mu\nu}
+    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_b} \nonumber\\
+    &=& - \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} S_{\mu\nu}
+    \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} \nonumber\\
+    &=& -  \sum_a  \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} q_a
+\end{eqnarray}
+Using the above relation, the DFTB2/CPE energy can be simplified to:
+\begin{equation}
+    E_\mathrm{{dftb2/cpe}} = \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2}\sum_{ab} \left(q_a + q_a^0 \right)\Delta q_b \gamma_{ab}
+    - \sum_a  \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} q_a + E_{\mathrm{cpe}}
+\end{equation}
 
 
 \clearpage
@@ -130,10 +161,11 @@ Separating the terms that appear in the standard DFTB2 gradient, and the DFTB2/C
 The last term is new, and is presented in the next sections.
 
 \subsection{CPE gradient: $-F_{kx}^\mathrm{(cpe)} = \frac{\partial E_\mathrm{cpe}}{\partial R_{kx}}$}
-The CPE energy depends explicitly on the coordinates via the Coulomb integrals, and implicitly on the coordinates via the CPE coefficients and the Mulliken charges:
+The CPE energy depends explicitly on the coordinates via the Coulomb integrals, and implicitly on the coordinates via the CPE coefficients and the Mulliken population:
 
 \begin{eqnarray}
--F_{kx}^\mathrm{(cpe)} &=& \frac{\partial E_\mathrm{{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx}} \nonumber\\
+    -F_{kx}^\mathrm{(cpe)} &=& \frac{\partial E_\mathrm{{cpe}}\left(R_{kx}\right)}{\partial R_{kx}} \nonumber\\
+%-F_{kx}^\mathrm{(cpe)} &=& \frac{\partial E_\mathrm{{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx}} \nonumber\\
     &=& \sum_i \frac{\partial E_\mathrm{{cpe}}\left(\mathbf{q}, c_{i}(R_{kx})\right)}{\partial c_{i}}    
     \frac{\partial c_{i}(R_{kx})}{\partial R_{kx}} 
     + \sum_a \frac{\partial E_\mathrm{{cpe}}\left(q_a(R_{kx}), \mathbf{c}\right)}{\partial q_a}    
@@ -142,8 +174,8 @@ The CPE energy depends explicitly on the coordinates via the Coulomb integrals, 
 \end{eqnarray}
 The first derivative term is zero, since the CPE energy is variationally optimized with respect to the $\mathbf{c}$ coefficients. 
 \subsubsection{Dependence on $q_a$}
-The second term can be divided into two factors. The first factor can be calculated as described in the previous section (it is the same term as found in the Hamiltonian-shift.) 
-E.g. in the CPE charge-independent case:
+The second term can be divided into two factors. The first factor can be calculated as described in the previous section (it is the same term as found in the Hamiltonian-shift.) - i.e.~the derivatives with respect to the Mulliken populations. 
+In the CPE charge-independent case:
 \begin{equation}
     \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} = [\mathbf{c^T}  \cdot \mathbf{M}]_a
 \end{equation}
@@ -172,38 +204,6 @@ The derivative with respect to $R_{kx}$ is written via the matrix derivatives.
     \mathbf{c^T} \cdot \left( \frac{\mathrm{\partial}\mathbf{M}}{\mathrm{\partial}R_{kx}}\right) \cdot \mathbf{q} 
     + \frac{1}{2}\mathbf{c}^T \cdot \left( \frac{\mathrm{\partial}\mathbf{N}}{\mathrm{\partial}R_{kx}}\right) \cdot \mathbf{c}. 
 \end{equation}
-% The elements of the derivative matrices are the integral derivatives, shown in the appendix.
-
-% \subsection{Shift gradient: $-F_{kx}^\mathrm{(shift)} = \frac{\partial E_\mathrm{shift}}{\partial R_{kx}}$}
-% \begin{eqnarray}
-%     \frac{\partial E_\mathrm{shift}}{\partial R_{kx}} &=& - \frac{1}{2} \frac{\partial }{\partial R_{kx}}\left[ \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} S_{\mu\nu} \left(
-%     \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} +
-%     \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_b}
-% \right)\right]\nonumber\\
-% &=& - \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} \left[ \frac{\partial S_{\mu\nu}}{\partial R_{kx}}\left( 
-%     \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} +
-%     \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_b}
-% \right) \right. \nonumber\\
-% && \left.+ S_{\mu\nu} \left(
-%     \frac{\partial^2 E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx}\partial q_a} +
-%     \frac{\partial^2 E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx} \partial q_b}
-% \right) \right]
-% \end{eqnarray}
-% The derivative of the overlap matrix is performed numerically, while the derivative of the CPE-energy is given by (in the charge-independent case):
-% \begin{equation}
-%     \frac{\partial^2 E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx}\partial q_a} = \frac{\partial}{\partial R_{kx}}\left[\mathbf{c^T} \cdot \mathbf{M}\right]_a = \left[\mathbf{c^T}  \cdot \frac{\partial \mathbf{M}}{\partial R_{kx}} \right]_a
-% \end{equation}
-% and similarly in the charge-dependent case:
-% \begin{eqnarray}
-%     \frac{\partial^2 E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx}\partial q_a} &=& \frac{\partial }{\partial R_{kx}} \left[
-%     \mathbf{c^T} \cdot \left( \frac{\mathrm{\partial}\mathbf{M}}{\mathrm{\partial}q_a}\right) \cdot \mathbf{q} 
-%     + [\mathbf{c^T}  \cdot \mathbf{M}]_a + 
-% \frac{1}{2}\mathbf{c}^T \cdot \left( \frac{\mathrm{\partial}\mathbf{N}}{\mathrm{\partial}q_a}\right) \cdot \mathbf{c} \right] \nonumber\\
-% &=& \mathbf{c^T} \cdot \left( \frac{\mathrm{\partial^2}\mathbf{M}}{\partial R_{kx}\mathrm{\partial}q_a}\right) \cdot \mathbf{q} 
-% + \left[\mathbf{c^T}  \cdot \frac{\partial \mathbf{M}}{\partial R_{kx}} \right]_a
-% +\frac{1}{2}\mathbf{c}^T \cdot \left( \frac{\mathrm{\partial}^2\mathbf{N}}{\partial R_{kx}\mathrm{\partial}q_a}\right) \cdot \mathbf{c}
-% \end{eqnarray}
-% The matrix derivatives $\frac{\mathrm{\partial}^2\mathbf{M}}{\partial R_{kx}\mathrm{\partial}q_a}$ and $\frac{\mathrm{\partial}^2\mathbf{N}}{\partial R_{kx}\mathrm{\partial}q_a}$ are new and not implemented.
 
 
 \bibliographystyle{unsrt}
@@ -214,7 +214,7 @@ The derivative with respect to $R_{kx}$ is written via the matrix derivatives.
 \section{Hamiltonian shift}
 
 \subsection{Mulliken charges}
-The Mulliken charge is given by:
+The Mulliken population is given by:
 \begin{equation}
     q_a = \sum_i^\mathrm{occ} n_i \sum_{\mu \in a} \sum_{\nu}
     C_{\mu i} C_{\nu i} S_{\mu\nu}
@@ -223,7 +223,7 @@ The charge fluctuation is then:
 \begin{equation}
     \Delta q_a = q_a - q_a^0
 \end{equation}
-
+Note that the \textit{Mulliken population} is always a positive number, and the \textit{Mulliken charge} is the negative of the Mulliken population.
 \subsection{Density matrix elements}
 The density matrix is defined in terms of the coefficient matrix:
 \begin{equation}
@@ -239,12 +239,13 @@ The Hamiltonian shift is calculated using the chain rule:
     \frac{\partial c_i}{\partial \rho_{\mu\nu}}
     + \sum_a \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} 
     \frac{\partial q_a}{\partial \rho_{\mu\nu}}\\
-    &=& - \frac{1}{2} S_{\mu\nu} \left(
+    &=& \frac{1}{2} S_{\mu\nu} \left(
     \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} +
     \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_b}
 \right) \qquad \mu \in a, \nu \in b
 \end{eqnarray}
-The CPE energy has no parametric dependence on the density, but depends implicitly via the charges and coefficients.
+Note that the last derivative is taken with respect to the Mulliken population. In Giese and York (2012) the negative sign is adopted.
+\\\\The CPE energy has no parametric dependence on the density, but depends implicitly via the charges and coefficients.
 The first term is zero due to the CPE energy being variationally minimized with respect to the coefficients.
 The first part of the second term is in the CPE charge-independent case:
 \begin{equation}
