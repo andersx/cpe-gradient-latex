@@ -1,11 +1,11 @@
 all:
-	pdflatex main.tex
-	bibtex main.aux
-	pdflatex main.tex
-	pdflatex main.tex
+	pdflatex gradient.tex
+	bibtex gradient.aux
+	pdflatex gradient.tex
+	pdflatex gradient.tex
 
 clean:
-	rm main.bbl
-	rm main.blg
-	rm main.aux
-	rm main.log
+	rm gradient.bbl
+	rm gradient.blg
+	rm gradient.aux
+	rm gradient.log
