@@ -68,7 +68,7 @@ The CPE Hamiltonian shift is given by:\cite{gieseyork2012}
 See Appendix A for details.
 \\\\The full DFTB2/CPE energy is given by:
 \begin{eqnarray}
-    E_\mathrm{{dftb2/cpe}} &=& \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} \left(H_{\mu\nu}^{\mathrm{(dftb2)}} + \Delta H_{\mu\nu}^{\mathrm{(cpe)}} \right) 
+    E_\mathrm{{dftb2/cpe}} &=& \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} H_{\mu\nu}^{\mathrm{(dftb2)}}  
     + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab}
     + E_{\mathrm{cpe}} \nonumber\\
     &=& \underbrace{\sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu}}_{E_\mathrm{H0}}
@@ -133,11 +133,11 @@ The last term is new, and is presented in the next sections.
 The CPE energy depends explicitly on the coordinates via the Coulomb integrals, and implicitly on the coordinates via the CPE coefficients and the Mulliken charges:
 
 \begin{eqnarray}
--F_{kx}^\mathrm{(cpe)} &=& \frac{\mathrm{d} E_\mathrm{{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\mathrm{d} R_{kx}} \nonumber\\
+-F_{kx}^\mathrm{(cpe)} &=& \frac{\partial E_\mathrm{{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx}} \nonumber\\
     &=& \sum_i \frac{\partial E_\mathrm{{cpe}}\left(\mathbf{q}, c_{i}(R_{kx})\right)}{\partial c_{i}}    
-    \frac{\mathrm{d} c_{i}(R_{kx})}{\mathrm{d} R_{kx}} 
+    \frac{\partial c_{i}(R_{kx})}{\partial R_{kx}} 
     + \sum_a \frac{\partial E_\mathrm{{cpe}}\left(q_a(R_{kx}), \mathbf{c}\right)}{\partial q_a}    
-    \frac{\mathrm{d} q_a(R_{kx})}{\mathrm{d} R_{kx}} 
+    \frac{\partial q_a(R_{kx})}{\partial R_{kx}} 
     + \frac{\partial E_\mathrm{{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial R_{kx}}
 \end{eqnarray}
 The first derivative term is zero, since the CPE energy is variationally optimized with respect to the $\mathbf{c}$ coefficients. 
@@ -163,7 +163,8 @@ or for $a=k$:
     \frac{\partial q_{k}}{\partial R_{kx}} 
     = \sum_i^\mathrm{occ} n_i \sum_{\mu \in k} \sum_{\nu \not\in k}  C_{\mu i} C_{\nu i}\frac{\partial S_{\mu\nu}}{\partial R_{kx}}
 \end{equation}
-This term must be calculated in the DFTB2 gradient code (missing up to now). 
+This term must be calculated in the DFTB2 gradient code, where the derivative of the overlap matrix is already being calculated.
+
 \subsubsection{(Explicit) dependence on $R_{kx}$}
 The derivative with respect to $R_{kx}$ is written via the matrix derivatives.
 \begin{equation}
