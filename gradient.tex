@@ -8,6 +8,8 @@
 \usepackage{graphicx}
 \usepackage{fullpage}
 \usepackage{amsmath}
+\usepackage{cases}
+\usepackage{mathtools}
 
 %\newcommand{\beq}{\begin{equation}}
 %\newcommand{\eeq}{\end{equation}}
@@ -31,7 +33,7 @@ Summation over atom centers is denoted by summation over indices $a, b, c,$ etc.
 \begin{equation}
     \Delta q_a = q_a - q_a^0
 \end{equation}
-
+All the equations are presented for DFTB2, but the presented derived terms are the same for DFTB3, since the extra DFTB3 energy terms are additive.
 
 \section{DFTB2/CPE energy}
 
@@ -41,11 +43,11 @@ The CPE energy is given by:\cite{cpekaminski}
 \begin{equation}
     E_{\mathrm{cpe}} = \mathbf{c}^T \cdot \mathbf{M} \cdot \mathbf{q} + \frac{1}{2} \mathbf{c}^T \cdot \mathbf{N} \cdot \mathbf{c},\label{eq:cpe_energy}
 \end{equation}
-where the first order CPE-CPE Coulomb interaction matrix elements are given by:
+where the first order CPE-DFTB2 Coulomb interaction matrix elements are given by:
 \begin{equation}
     M_{ij} = f(R_{ij})\iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}\right)\phi_j^\mathrm{dftb2}\left(\mathbf{r'}\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
 \end{equation}
-and the second order CPE-DFTB2 Coulomb interaction matrix elements are given by:
+and the second order CPE-CPE Coulomb interaction matrix elements are given by:
 \begin{equation}
     N_{ij} = \iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}\right)\phi_j^\mathrm{cpe}\left(\mathbf{r'}\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
 \end{equation}
@@ -206,33 +208,148 @@ The derivative with respect to $R_{kx}$ is written via the matrix derivatives.
 \end{equation}
 
 
+\clearpage
+\section{DFTB2 electric field contribution}
+The energy in an electric field $\vec{F}$ is given by the interaction of the field with the Mulliken charges (here in terms of the Mulliken populations):
+\begin{equation}
+    E_\mathrm{EF/dftb2} = \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}+ \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} + \underbrace{\sum_a q_a\ \vec{F} \cdot \vec{r}_a}_{\Delta E_{\mathrm{EF/dftb2}}}\label{eq:dftb_ef_energy}
+\end{equation}
+First we note the following relation:
+\begin{equation}
+    \frac{\partial \Delta E_{\mathrm{EF/dftb2}}}{\partial q_a}
+    = \frac{\partial}{\partial q_a} \sum_{a'} q_{a'}\ \vec{F} \cdot \vec{r}_{a'} = \vec{F} \cdot \vec{r}_a
+\end{equation}
+Combining the above with Eq.~\ref{eq:q_rho}, the corresponding Hamiltonian element to be added to the DFTB2 Hamiltonian element is given by:
+\begin{eqnarray}
+    \Delta H_{\mu\nu}^{\mathrm{(EF/dftb2)}} 
+    &\equiv& \frac{\partial \Delta  E_{\mathrm{EF/dftb2}}}{\partial \rho_{\mu\nu}}\nonumber\\
+    &=&  \sum_a \frac{\partial \Delta  E_{\mathrm{EF/dftb2}}}{\partial q_a} 
+     \frac{\partial q_a}{\partial \rho_{\mu\nu}}\nonumber\\
+     &=& \frac{1}{2} S_{\mu\nu} \left( \vec{r}_a + \vec{r}_b
+ \right) \cdot \vec{F}  \qquad \mu \in a, \nu \in b
+\end{eqnarray}
+So the matrix elements of the DFTB2 Hamiltonian matrix in the presence of an electric field  are:
+\begin{equation}
+    H_{\mu\nu} = H^0_{\mu\nu} + \frac{1}{2}S_{\mu\nu} \sum_c \left( \gamma_{ac} + \gamma_{bc} \right)\Delta q_c  + \frac{1}{2} S_{\mu\nu} \left( \vec{r}_a + \vec{r}_b \right) \cdot \vec{F}  \qquad \mu \in a, \nu \in b \label{eq:dftb_ef_hamil}
+\end{equation}
+The DFTB2 energy in an electric field has the following orbital energies:
+\begin{eqnarray}
+    \sum_i^\mathrm{occ} n_i \varepsilon_i 
+    &=& \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} H_{\mu\nu}\nonumber\\
+    &=& \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} \left(H_{\mu\nu}^{\mathrm{(dftb2)}} + \Delta H_{\mu\nu}^{\mathrm{(EF/dftb2)}} \right)\nonumber\\
+    &=& \sum_i^\mathrm{occ} n_i \sum_{\mu} \sum_{\nu}  C_{\mu i} C_{\nu i} H_{\mu\nu}^0
+    + \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} S_{\mu\nu} \sum_c \left( \gamma_{ac} + \gamma_{bc} \right)\Delta q_c \nonumber\\
+    && + \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} 
+    S_{\mu\nu} \left( \vec{r}_a + \vec{r}_b \right) \cdot \vec{F} \label{eq:orbital_energies_ef}
+\end{eqnarray}
+Isolating $H_0$ in the above and inserting into Eq.~\ref{eq:dftb_ef_energy} the DFTB2 energy in the presence of an external field is written in terms of the orbital energies:
+\begin{eqnarray}
+    E_\mathrm{EF/dftb2}  
+    &=& \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} S_{\mu\nu} \sum_c \left( \gamma_{ac} + \gamma_{bc} \right)\Delta q_c \nonumber\\
+    && -\ \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} 
+    S_{\mu\nu} \left( \vec{r}_a + \vec{r}_b \right) \cdot \vec{F}  + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} + \sum_a q_a\ \vec{F} \cdot \vec{r}_a \nonumber\\
+    &=& \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2}\sum_{ab} \left(q_a + q_a^0 \right)\Delta q_b \gamma_{ab} + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab}
+\end{eqnarray}
+So no terms have to be added to the energy expressed in terms of the orbital energies.
+
+
+\subsection{DFTB2 dipole moment}
+The dipole moment of a molecule is given by the DFTB Mulliken populations:
+\begin{equation}
+    \vec{\mu}^{(dftb2)} = \sum_a q_a\ \vec{r}_a
+\end{equation}
+
+
+\section{DFTB2/CPE electric field contribution}
+\begin{eqnarray}
+    E_\mathrm{EF/dftb2/cpe} 
+    &=& \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}+ \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} + \sum_a q_a\ \vec{F} \cdot \vec{r}_a\nonumber\\
+    && +\ E_{\mathrm{cpe}} + \underbrace{\sum_a \vec{F} \cdot \vec{\mu}^{\mathrm{(cpe)}}_a}_{E_{\mathrm{EF/cpe}}}
+\end{eqnarray}
+where $\vec{\mu}^{\mathrm{(cpe)}}_a$ is the total dipole due to the CPE-basis functions centered on atom $a$, given by the coefficients to the same functions:
+\begin{equation}
+    \vec{\mu}^{\mathrm{(cpe)}}_a =  
+    \begin{bmatrix}
+        c_{ax}\\
+        c_{ay}\\
+        c_{az}\\
+    \end{bmatrix}
+\end{equation}
+where $c_{ax}$ is the coefficient of the dipole function centered on atom $a$ in the $x$-direction, and so on.
+\\\\We can use the above definition of the dipole moment to show, that the Hamiltonian contribution due to the CPE-dipoles vanishes (due to the CPE-coefficients being optimized variationally.)
+\begin{eqnarray}
+    \Delta H_{\mu\nu}^{\mathrm{(EF/cpe)}} 
+    &\equiv& \frac{\partial \Delta E_{\mathrm{EF/cpe}}}{\partial \rho_{\mu\nu}}\nonumber\\
+    &=&  \sum_i \frac{\partial \Delta E_{\mathrm{EF/cpe}}}{\partial c_i} 
+     \frac{\partial c_i}{\partial \rho_{\mu\nu}}= 0
+\end{eqnarray}
+Since no terms from the CPE basis/electric field interaction enter the Hamiltonian matrix, we can write the DFTB2/CPE energy in the presence of an external field in terms of the orbital energies as:
+\begin{equation}
+    E_\mathrm{EF/dftb2/cpe}  
+    = \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2}\sum_{ab} \left(q_a + q_a^0 \right)\Delta q_b \gamma_{ab} + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} - \sum_a  \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} q_a + E_{\mathrm{cpe}} + \sum_a \vec{F} \cdot \vec{\mu}^{\mathrm{(cpe)}}_a
+\end{equation}
+
+
+\subsection{DFTB2/CPE dipole moment}
+The total dipole-moment of the molecule in the DFTB2/CPE description is now:
+\begin{equation}
+    \vec{\mu}^{(dftb2/cpe)} = \sum_a q_a\ \vec{r}_a + \sum_a \vec{\mu}^{\mathrm{(cpe)}}_a
+\end{equation}
+
+
+\clearpage
+\section{DFTB2/CPE polarizability}
+The elements of the polarizability tensor is calculated as:
+\begin{equation}
+    \alpha_{ij} = \left(\frac{\partial \mu_i }{\partial F_j}\right)
+\end{equation}
+where $i$ and $j$ are the $x$, $y$, $z$ Cartesian components and $\mu_i$ is the $i$-component of the DFTB2 or DFTB2/CPE dipole moment.
+The partial derivatives are calculated numerically by means of the two-point, forward-backtrack finite differences method.
+\\\\The isotropic polarizability used in the fitting routine is calculated as:
+\begin{equation}
+    \alpha_{\mathrm{iso}} = \frac{1}{3} \left( \alpha_{xx} +\alpha_{yy} + \alpha_{zz}  \right)
+\end{equation}
+
+
+
+
 \bibliographystyle{unsrt}
 \bibliography{references}
 \clearpage
 \section*{Appendices}
 \appendix
-\section{Hamiltonian shift}
+\section{Hamiltonian shifts}
 
-\subsection{Mulliken charges}
-The Mulliken population is given by:
+\subsection{Mulliken population}
+\label{sec:mulliken}
+First we define the density matrix is defined in terms of the coefficient matrix:
 \begin{equation}
-    q_a = \sum_i^\mathrm{occ} n_i \sum_{\mu \in a} \sum_{\nu}
-    C_{\mu i} C_{\nu i} S_{\mu\nu}
+    \rho_{\mu\nu} = \sum_i^\mathrm{occ} n_i C_{\mu i} C_{\nu i}
 \end{equation}
+We can then define the Mulliken population by the density matrix:
+\begin{eqnarray}
+    q_a 
+    &=& \sum_i^\mathrm{occ} n_i \sum_{\mu \in a} \sum_b \sum_{\nu \in b} C_{\mu i} C_{\nu i} S_{\mu\nu}\nonumber\\
+    &=& \frac{1}{2} \sum_{\mu \in a} \sum_b \sum_{\nu \in b} \left( \rho_{\mu\nu} + \rho_{\nu\mu}\right) S_{\mu\nu}
+\end{eqnarray}
 The charge fluctuation is then: 
 \begin{equation}
     \Delta q_a = q_a - q_a^0
 \end{equation}
-Note that the \textit{Mulliken population} is always a positive number, and the \textit{Mulliken charge} is the negative of the Mulliken population.
-\subsection{Density matrix elements}
-The density matrix is defined in terms of the coefficient matrix:
+Using these definitions we derive the following relation:
 \begin{equation}
-    \rho_{\mu\nu} = \sum_i^\mathrm{occ} n_i C_{\mu i} C_{\nu i}
+    \frac{\partial q_a}{\partial \rho_{\mu\nu}}
+    = \frac{\partial }{\partial \rho_{\mu\nu}} \left[ \frac{1}{2} \sum_{\mu \in a} \sum_b \sum_{\nu \in b} \left( \rho_{\mu\nu} + \rho_{\nu\mu}\right) S_{\mu\nu} \right]
+    = \begin{cases} 
+        \frac{1}{2} S_{\mu\nu}& \quad \mu \in a\\
+        \frac{1}{2} S_{\mu\nu}& \quad \nu \in a\\
+        S_{\mu\nu}& \quad \mu \in a \quad \mathrm{and}\quad \nu \in a\\
+    \end{cases}\label{eq:q_rho}
 \end{equation}
+Note that the \textit{Mulliken population} is always a positive number, and the \textit{Mulliken charge} is the negative of the Mulliken population.
 
-\subsection{Hamiltonian shift}
-The Hamiltonian shift is calculated using the chain rule:
-
+\subsection{CPE Hamiltonian shift}
+Using the relation from section \ref{sec:mulliken}, the CPE Hamiltonian shift is calculated using the chain rule:
 \begin{eqnarray}
     \Delta H_{\mu\nu}^{\mathrm{(cpe)}} &=& \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial \rho_{\mu\nu}}\\
     &=& \sum_i \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial c_i} 
@@ -258,47 +375,5 @@ In the CPE charge-dependent case:
     + [\mathbf{c^T}  \cdot \mathbf{M}]_a + \frac{1}{2}\mathbf{c}^T \cdot \left( \frac{\mathrm{\partial}\mathbf{N}}{\mathrm{\partial}q_a}\right) \cdot \mathbf{c}. 
 \end{equation}
 See Giese and York (2012) for details.\cite{gieseyork2012}
-
-% \section{Derivative matrix elements}
-% 
-% \subsection{First order matrix (geometry)}
-% The matrix elements are:
-% \begin{equation}
-%     \frac{\mathrm{\partial} N_{ij}}{\mathrm{\partial}R_{kx}} =
-%     \frac{\mathrm{\partial}}{\mathrm{\partial}R_{kx}}  \iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}\right)\phi_j^\mathrm{cpe}\left(\mathbf{r'}\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
-% \end{equation}
-% This is already implemented.
-% 
-% \subsection{First order matrix (charge)}
-% The matrix elements are:
-% \begin{equation}
-% \frac{\mathrm{\partial} N_{ij}}{\mathrm{\partial}q_k} =
-%     \frac{\mathrm{\partial}}{\mathrm{\partial}q_k}  \iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}\right)\phi_j^\mathrm{cpe}\left(\mathbf{r'}\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
-% \end{equation}
-% This is already implemented.
-% 
-% \subsection{Second order matrix (geometry)}
-% The matrix elements are:
-% \begin{equation}
-%     \frac{\mathrm{\partial} M_{ij}}{\mathrm{\partial}R_{kx}} =
-%     f(R_{ij})\frac{\mathrm{\partial}}{\mathrm{\partial}R_{kx}}  \iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}\right)\phi_j^\mathrm{dftb}\left(\mathbf{r'}\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
-%     + \frac{\mathrm{\partial}f(R_{ij})}{\mathrm{\partial}R_{kx}}  \iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}\right)\phi_j^\mathrm{dftb}\left(\mathbf{r'}\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
-% \end{equation}
-% This is already implemented.
-% 
-% \subsection{Second order matrix (charge)}
-% The matrix elements are (for DFTB2):
-% \begin{equation}
-% \frac{\mathrm{\partial} M_{ij}}{\mathrm{\partial}q_k} =
-%     f(R_{ij})\frac{\mathrm{\partial}}{\mathrm{\partial}q_k}  \iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}, q_i\right)\phi_j^\mathrm{dftb2}\left(\mathbf{r'}\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
-% \end{equation}
-% This is already implemented, where as for DFTB3, the DFTB basis function is also dependent on the charge, and the integral derivative is thus different:
-% \begin{equation}
-% \frac{\mathrm{\partial} M_{ij}}{\mathrm{\partial}q_k} =
-%     f(R_{ij})\frac{\mathrm{\partial}}{\mathrm{\partial}q_k}  \iint \frac{\phi_i^\mathrm{cpe}\left(\mathbf{r}, q_i\right)\phi_j^\mathrm{dftb3}\left(\mathbf{r'}, q_j\right)}{\left| \mathbf{r} - \mathbf{r'}\right|} \mathrm{d}\mathbf{r}\mathrm{d}\mathbf{r'}
-% \end{equation}
-% This is already implemented (also for DFTB3).
-% 
-% 
 \end{document}
  
