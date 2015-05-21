@@ -210,11 +210,15 @@ The derivative with respect to $R_{kx}$ is written via the matrix derivatives.
 
 \clearpage
 \section{DFTB2 electric field contribution}
-The energy in an electric field $\vec{F}$ is given by the interaction of the field with the Mulliken charges (here in terms of the Mulliken populations):
-\begin{equation}
-    E_\mathrm{EF/dftb2} = \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}+ \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} + \underbrace{\sum_a q_a\ \vec{F} \cdot \vec{r}_a}_{\Delta E_{\mathrm{EF/dftb2}}}\label{eq:dftb_ef_energy}
-\end{equation}
-First we note the following relation:
+The energy in an electric field $\vec{F}$ is given by the interaction of the field with the partial charges:
+\begin{eqnarray}
+    E_\mathrm{EF/dftb2} 
+    &=& \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}+ \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} - \sum_a \Delta Q_a\ \vec{F} \cdot \vec{r}_a\nonumber\\
+    &=& \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}+ \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} \\
+    &&+\ \underbrace{\sum_a q_a\ \vec{F} \cdot \vec{r}_a}_{\Delta E_{\mathrm{EF/dftb2}}}\label{eq:dftb_ef_energy} - \sum_a Q^0_a\ \vec{F} \cdot \vec{r}_a
+\end{eqnarray}
+where $q_a$ are the Mulliken populations, $\Delta Q_a$ are the partial Mulliken charges, and $Q^0_a$ are the charges of the nuclei.
+Before deriving the Hamiltonian we note the following relation:
 \begin{equation}
     \frac{\partial \Delta E_{\mathrm{EF/dftb2}}}{\partial q_a}
     = \frac{\partial}{\partial q_a} \sum_{a'} q_{a'}\ \vec{F} \cdot \vec{r}_{a'} = \vec{F} \cdot \vec{r}_a
@@ -248,23 +252,24 @@ Isolating $H_0$ in the above and inserting into Eq.~\ref{eq:dftb_ef_energy} the 
     &=& \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} S_{\mu\nu} \sum_c \left( \gamma_{ac} + \gamma_{bc} \right)\Delta q_c \nonumber\\
     && -\ \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} 
     S_{\mu\nu} \left( \vec{r}_a + \vec{r}_b \right) \cdot \vec{F}  + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} + \sum_a q_a\ \vec{F} \cdot \vec{r}_a \nonumber\\
-    &=& \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2}\sum_{ab} \left(q_a + q_a^0 \right)\Delta q_b \gamma_{ab} + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab}
+    &=& \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2}\sum_{ab} \left(q_a + q_a^0 \right)\Delta q_b \gamma_{ab} + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab}  - \sum_a Q^0_a\ \vec{F} \cdot \vec{r}_a
 \end{eqnarray}
-So no terms have to be added to the energy expressed in terms of the orbital energies.
+So only the nuclear charge term has to be added to the energy expressed in terms of the orbital energies.
 
 
 \subsection{DFTB2 dipole moment}
-The dipole moment of a molecule is given by the DFTB Mulliken populations:
+The dipole moment of a molecule is given by the DFTB2 Mulliken partial charges.
 \begin{equation}
-    \vec{\mu}^{(dftb2)} = \sum_a q_a\ \vec{r}_a
+    \vec{\mu}^{(dftb2)} = \sum_a \Delta Q_a\ \vec{r}_a = \sum_a Q^0_a\ \vec{r}_a - \sum_a q_a\ \vec{r}_a 
 \end{equation}
 
 
 \section{DFTB2/CPE electric field contribution}
+The CPE-dipole functions interact directly with an external field and enter the energy DFTB2/CPE energy as:
 \begin{eqnarray}
     E_\mathrm{EF/dftb2/cpe} 
-    &=& \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}+ \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} + \sum_a q_a\ \vec{F} \cdot \vec{r}_a\nonumber\\
-    && +\ E_{\mathrm{cpe}} + \underbrace{\sum_a \vec{F} \cdot \vec{\mu}^{\mathrm{(cpe)}}_a}_{E_{\mathrm{EF/cpe}}}
+    &=& \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}+ \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} - \sum_a \Delta Q_a\ \vec{F} \cdot \vec{r}_a\nonumber\\
+    && +\ E_{\mathrm{cpe}} - \underbrace{\sum_a \vec{F} \cdot \vec{\mu}^{\mathrm{(cpe)}}_a}_{\Delta E_{\mathrm{EF/cpe}}}
 \end{eqnarray}
 where $\vec{\mu}^{\mathrm{(cpe)}}_a$ is the total dipole due to the CPE-basis functions centered on atom $a$, given by the coefficients to the same functions:
 \begin{equation}
@@ -284,16 +289,17 @@ where $c_{ax}$ is the coefficient of the dipole function centered on atom $a$ in
      \frac{\partial c_i}{\partial \rho_{\mu\nu}}= 0
 \end{eqnarray}
 Since no terms from the CPE basis/electric field interaction enter the Hamiltonian matrix, we can write the DFTB2/CPE energy in the presence of an external field in terms of the orbital energies as:
-\begin{equation}
+\begin{eqnarray}
     E_\mathrm{EF/dftb2/cpe}  
-    = \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2}\sum_{ab} \left(q_a + q_a^0 \right)\Delta q_b \gamma_{ab} + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} - \sum_a  \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} q_a + E_{\mathrm{cpe}} + \sum_a \vec{F} \cdot \vec{\mu}^{\mathrm{(cpe)}}_a
-\end{equation}
+    &=& \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2}\sum_{ab} \left(q_a + q_a^0 \right)\Delta q_b \gamma_{ab} + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} -\sum_a \Delta Q_a\ \vec{F} \cdot \vec{r}_a\nonumber\\
+    && - \sum_a  \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} q_a +\ E_{\mathrm{cpe}} - \sum_a \vec{F} \cdot \vec{\mu}^{\mathrm{(cpe)}}_a
+\end{eqnarray}
 
 
 \subsection{DFTB2/CPE dipole moment}
 The total dipole-moment of the molecule in the DFTB2/CPE description is now:
 \begin{equation}
-    \vec{\mu}^{(dftb2/cpe)} = \sum_a q_a\ \vec{r}_a + \sum_a \vec{\mu}^{\mathrm{(cpe)}}_a
+    \vec{\mu}^{\mathrm{(dftb2/cpe)}} = \sum_a q_a\ \vec{r}_a + \sum_a \vec{\mu}^{\mathrm{(cpe)}}_a
 \end{equation}
 
 
