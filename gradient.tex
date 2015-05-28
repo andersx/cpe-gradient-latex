@@ -33,6 +33,10 @@ Summation over atom centers is denoted by summation over indices $a, b, c,$ etc.
 \begin{equation}
     \Delta q_a = q_a - q_a^0
 \end{equation}
+\\\\Similarly the \textit{partial Mulliken charge} is defined as 
+\begin{equation}
+    \Delta Q_a = q_a^0 - q_a = - \Delta q_a
+\end{equation}
 All the equations are presented for DFTB2, but the presented derived terms are the same for DFTB3, since the extra DFTB3 energy terms are additive.
 
 \section{DFTB2/CPE energy}
@@ -215,9 +219,9 @@ The energy in an electric field $\vec{F}$ is given by the interaction of the fie
     E_\mathrm{EF/dftb2} 
     &=& \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}+ \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} - \sum_a \Delta Q_a\ \vec{F} \cdot \vec{r}_a\nonumber\\
     &=& \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}+ \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} \\
-    &&+\ \underbrace{\sum_a q_a\ \vec{F} \cdot \vec{r}_a}_{\Delta E_{\mathrm{EF/dftb2}}}\label{eq:dftb_ef_energy} - \sum_a Q^0_a\ \vec{F} \cdot \vec{r}_a
+    &&+\ \underbrace{\sum_a q_a\ \vec{F} \cdot \vec{r}_a}_{\Delta E_{\mathrm{EF/dftb2}}}\label{eq:dftb_ef_energy} - \sum_a q^0_a\ \vec{F} \cdot \vec{r}_a
 \end{eqnarray}
-where $q_a$ are the Mulliken populations, $\Delta Q_a$ are the partial Mulliken charges, and $Q^0_a$ are the charges of the nuclei.
+where $q_a$ are the Mulliken populations, $\Delta Q_a$ are the partial Mulliken charges, and $q^0_a$ are the charges of the nuclei.
 Before deriving the Hamiltonian we note the following relation:
 \begin{equation}
     \frac{\partial \Delta E_{\mathrm{EF/dftb2}}}{\partial q_a}
@@ -252,7 +256,7 @@ Isolating $H_0$ in the above and inserting into Eq.~\ref{eq:dftb_ef_energy} the 
     &=& \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} S_{\mu\nu} \sum_c \left( \gamma_{ac} + \gamma_{bc} \right)\Delta q_c \nonumber\\
     && -\ \frac{1}{2} \sum_i^\mathrm{occ} n_i \sum_a \sum_{\mu \in a} \sum_b \sum_{\nu \in b}  C_{\mu i} C_{\nu i} 
     S_{\mu\nu} \left( \vec{r}_a + \vec{r}_b \right) \cdot \vec{F}  + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} + \sum_a q_a\ \vec{F} \cdot \vec{r}_a \nonumber\\
-    &=& \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2}\sum_{ab} \left(q_a + q_a^0 \right)\Delta q_b \gamma_{ab} + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab}  - \sum_a Q^0_a\ \vec{F} \cdot \vec{r}_a
+    &=& \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2}\sum_{ab} \left(q_a + q_a^0 \right)\Delta q_b \gamma_{ab} + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab}  - \sum_a q^0_a\ \vec{F} \cdot \vec{r}_a
 \end{eqnarray}
 So only the nuclear charge term has to be added to the energy expressed in terms of the orbital energies.
 
@@ -260,18 +264,55 @@ So only the nuclear charge term has to be added to the energy expressed in terms
 \subsection{DFTB2 dipole moment}
 The dipole moment of a molecule is given by the DFTB2 Mulliken partial charges.
 \begin{equation}
-    \vec{\mu}^{(dftb2)} = \sum_a \Delta Q_a\ \vec{r}_a = \sum_a Q^0_a\ \vec{r}_a - \sum_a q_a\ \vec{r}_a 
+    \vec{\mu}^{(dftb2)} = \sum_a \Delta Q_a\ \vec{r}_a = \sum_a q^0_a\ \vec{r}_a - \sum_a q_a\ \vec{r}_a 
 \end{equation}
 
 
 \section{DFTB2/CPE electric field contribution}
-The CPE-dipole functions interact directly with an external field and enter the energy DFTB2/CPE energy as:
+The CPE-dipole functions interact directly with an external electric field and enter the energy CPE energy as:
+\begin{equation}
+    E_{\mathrm{EF/cpe}} = \mathbf{c}^T \cdot \left( \mathbf{M} \cdot \mathbf{q} - \mathbf{f} \right) + \frac{1}{2} \mathbf{c}^T \cdot \mathbf{N} \cdot \mathbf{c},
+\end{equation}
+where $\mathbf{f}$ is a $3N$ vector containing $N$ repeats of the components of the electric field.
+% , i.e.
+% \begin{equation}
+%     \mathbf{f} = 
+%     \begin{bmatrix}
+%         F_{x}\\
+%         F_{y}\\
+%         F_{z}\\
+%         F_{x}\\
+%         F_{y}\\
+%         F_{z}\\
+%         \vdots
+%     \end{bmatrix}
+% \end{equation}
+In the electric field, the variational analytical solution of the coefficients becomes:
+\begin{equation}
+    \mathbf{c}= -\mathbf{N}^{-1} \cdot \left(\mathbf{M} \cdot \mathbf{q} - \mathbf{f} \right)
+\end{equation}
+The DFTB2/CPE energy in the electric field is simply:
+\begin{equation}
+  E_\mathrm{EF/dftb2/cpe} 
+= \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}+ \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} - \sum_a \Delta Q_a\ \vec{F} \cdot \vec{r}_a + E_{\mathrm{EF/cpe}}
+\end{equation}
+% \\\\We can use the above definition of the dipole moment to show, that the Hamiltonian contribution due to the CPE-dipoles vanishes (due to the CPE-coefficients being optimized variationally.)
+% \begin{eqnarray}
+%     \Delta H_{\mu\nu}^{\mathrm{(EF/cpe)}} 
+%     &\equiv& \frac{\partial \Delta E_{\mathrm{EF/cpe}}}{\partial \rho_{\mu\nu}}\nonumber\\
+%     &=&  \sum_i \frac{\partial \Delta E_{\mathrm{EF/cpe}}}{\partial c_i} 
+%      \frac{\partial c_i}{\partial \rho_{\mu\nu}}= 0
+% \end{eqnarray}
+\\\\Since no additional terms from the CPE basis/electric field interaction enter the Hamiltonian matrix (since this interaction does not depend on $\mathbf{q}$), we can write the DFTB2/CPE energy in the presence of an external field in terms of the orbital energies as:
 \begin{eqnarray}
-    E_\mathrm{EF/dftb2/cpe} 
-    &=& \sum_i^\mathrm{occ} n_i  \sum_\mu \sum_\nu C_{\mu i}  C_{\nu i} H^0_{\mu\nu} + \frac{1}{2} \sum_{ab} \Delta q_a \Delta q_b \gamma_{ab}+ \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} - \sum_a \Delta Q_a\ \vec{F} \cdot \vec{r}_a\nonumber\\
-    && +\ E_{\mathrm{cpe}} - \underbrace{\sum_a \vec{F} \cdot \vec{\mu}^{\mathrm{(cpe)}}_a}_{\Delta E_{\mathrm{EF/cpe}}}
+    E_\mathrm{EF/dftb2/cpe}  
+    &=& \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2}\sum_{ab} \left(q_a + q_a^0 \right)\Delta q_b \gamma_{ab} + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} -\sum_a \Delta Q_a\ \vec{F} \cdot \vec{r}_a\nonumber\\
+    && - \sum_a  \frac{\partial E_{\mathrm{EF/cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} q_a +\ E_{\mathrm{EF/cpe}}
 \end{eqnarray}
-where $\vec{\mu}^{\mathrm{(cpe)}}_a$ is the total dipole due to the CPE-basis functions centered on atom $a$, given by the coefficients to the same functions:
+Again, $q_a$ is a Mulliken \textit{population} and $\Delta Q_a$ is the partial Mulliken \textit{charge}.
+
+\subsection{DFTB2/CPE dipole moment}
+We define $\vec{\mu}^{\mathrm{(cpe)}}_a$ as the total dipole due to the CPE-basis functions centered on atom $a$. This is given by the coefficients to the same functions:
 \begin{equation}
     \vec{\mu}^{\mathrm{(cpe)}}_a =  
     \begin{bmatrix}
@@ -281,36 +322,22 @@ where $\vec{\mu}^{\mathrm{(cpe)}}_a$ is the total dipole due to the CPE-basis fu
     \end{bmatrix}
 \end{equation}
 where $c_{ax}$ is the coefficient of the dipole function centered on atom $a$ in the $x$-direction, and so on.
-\\\\We can use the above definition of the dipole moment to show, that the Hamiltonian contribution due to the CPE-dipoles vanishes (due to the CPE-coefficients being optimized variationally.)
-\begin{eqnarray}
-    \Delta H_{\mu\nu}^{\mathrm{(EF/cpe)}} 
-    &\equiv& \frac{\partial \Delta E_{\mathrm{EF/cpe}}}{\partial \rho_{\mu\nu}}\nonumber\\
-    &=&  \sum_i \frac{\partial \Delta E_{\mathrm{EF/cpe}}}{\partial c_i} 
-     \frac{\partial c_i}{\partial \rho_{\mu\nu}}= 0
-\end{eqnarray}
-Since no terms from the CPE basis/electric field interaction enter the Hamiltonian matrix, we can write the DFTB2/CPE energy in the presence of an external field in terms of the orbital energies as:
-\begin{eqnarray}
-    E_\mathrm{EF/dftb2/cpe}  
-    &=& \sum_i^\mathrm{occ} n_i \varepsilon_i - \frac{1}{2}\sum_{ab} \left(q_a + q_a^0 \right)\Delta q_b \gamma_{ab} + \frac{1}{2} \sum_{ab} V^\mathrm{rep}_{ab} -\sum_a \Delta Q_a\ \vec{F} \cdot \vec{r}_a\nonumber\\
-    && - \sum_a  \frac{\partial E_{\mathrm{cpe}}\left[\mathbf{q}, \mathbf{c}\right]}{\partial q_a} q_a +\ E_{\mathrm{cpe}} - \sum_a \vec{F} \cdot \vec{\mu}^{\mathrm{(cpe)}}_a
-\end{eqnarray}
-
-
-\subsection{DFTB2/CPE dipole moment}
 The total dipole-moment of the molecule in the DFTB2/CPE description is now:
 \begin{equation}
-    \vec{\mu}^{\mathrm{(dftb2/cpe)}} = \sum_a q_a\ \vec{r}_a + \sum_a \vec{\mu}^{\mathrm{(cpe)}}_a
+    \vec{\mu}^{\mathrm{(dftb2/cpe)}} = \sum_a \Delta Q_a\ \vec{r}_a + \sum_a \vec{\mu}^{\mathrm{(cpe)}}_a
 \end{equation}
 
 
-\clearpage
-\section{DFTB2/CPE polarizability}
+\section{DFTB2 and DFTB2/CPE polarizability}
 The elements of the polarizability tensor is calculated as:
 \begin{equation}
-    \alpha_{ij} = \left(\frac{\partial \mu_i }{\partial F_j}\right)
+    \alpha_{ij} = \left(\frac{\partial \mu_i }{\partial F_j}\right)_{\vec{F}=0} = - \left(\frac{\partial^2 E }{\partial F_i\partial F_j}\right)_{\vec{F}=0}
 \end{equation}
 where $i$ and $j$ are the $x$, $y$, $z$ Cartesian components and $\mu_i$ is the $i$-component of the DFTB2 or DFTB2/CPE dipole moment.
-The partial derivatives are calculated numerically by means of the two-point, forward-backtrack finite differences method.
+The partial derivatives are calculated numerically by means of the two-point, forward-backtrack finite differences method, e.g.:
+\begin{equation}
+ \alpha_{ij} = \frac{ \mu_i \left(F_j + h \right) - \mu_i\left(F_j - h\right) }{2h}% = \frac{ E\left(F_j\right) - E\left(F_j + h \right) - E\left(F_j - h\right) }{h^2}
+\end{equation}
 \\\\The isotropic polarizability used in the fitting routine is calculated as:
 \begin{equation}
     \alpha_{\mathrm{iso}} = \frac{1}{3} \left( \alpha_{xx} +\alpha_{yy} + \alpha_{zz}  \right)
